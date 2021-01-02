@@ -1,0 +1,18 @@
+sudo docker exec -it orchestrator /bin/bash
+sudo docker  ps -a
+sudo docker system prune
+sudo docker-compose down
+sudo docker container logs <container Name>
+sudo docker-compose build
+sudo docker-compose up 
+pgrep -u root containerd-shim
+sudo docker top 39389889055b
+ps -axfo pid,ppid|grep -w containerd-shim
+sudo docker container rm 8141e9e94fb4
+sudo docker container rm orchestrator
+sudo docker system prune --volumes -a
+sudo docker network ls
+sudo docker stop slave3
+sudo docker network rm cc_proj_local_network
+docker-compose --version
+

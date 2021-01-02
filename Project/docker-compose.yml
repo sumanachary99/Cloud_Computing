@@ -1,0 +1,67 @@
+version: '3' 
+services:
+    
+ rabbitmq:
+    build: ./rabbitmq
+    image: rabbitmq:latest
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+    networks:
+      - network 
+ zoo:
+    image: zookeeper
+    restart: on-failure
+    hostname: zoo
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 
+    networks:
+      - network
+ orchestrator:
+    build: ./orchestrator
+    image: orchestrator:latest
+    # command: python3 orchestrator.py
+    container_name: orchestrator
+    depends_on:
+     - "rabbitmq"
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    
+ master:
+    build: ./master
+    image: master:latest
+    container_name: master
+    # command: python3 worker.py
+    depends_on:
+     - "rabbitmq"
+    restart: always
+    # volumes:
+    #   - 'myshare:/shared' 
+    networks:
+      - network
+ slave:
+    build: ./slave
+    image: slave:latest
+    container_name: slave
+    # command: python3 worker.py
+    depends_on:
+     - "rabbitmq"
+    restart: always
+    networks:
+      - network
+networks:
+       network: {}
+# volumes:
+#   myshare:
+#     driver: local
